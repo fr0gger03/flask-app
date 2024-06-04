@@ -1,3 +1,9 @@
+# Python, Pandas, Flask - Working with data using Pandas and Flask
+
+This application grew out of a previous project - the <a href=https://github.com/vmware-archive/vmware-cloud-sizer-companion-cli>VMware Cloud Sizer Companion CLI.</a>  I am using several of the functions in that project to ingest an Excel file, perform some transformations on the data using Pandas, and return some basic statistics.
+
+The entire application has been 'containerized' so I may experiment with pushing to the cloud in a standardized way, and leverage CI/CD.
+
 ### Building and running your application
 
 When you're ready, start your application by running:
