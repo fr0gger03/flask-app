@@ -22,7 +22,8 @@ def describe_import(**kwargs):
             csv_file = rvtools_conversion(**view_params)
 
     if csv_file is not None:
-        data_describe(output_path,csv_file)
+        total_vms=data_describe(output_path,csv_file)
+        return total_vms
     else:
         print()
         print("Something went wrong.  Please check your syntax and try again.")
@@ -228,6 +229,7 @@ def data_describe(output_path,csv_file):
     # Ensure guest OS column is cast as string to better handle blank values
     vm_data_df['os'] = vm_data_df['os'].astype(str)
 
+    total_vms = vm_data_df.vmName.count()
     print(f'\nTotal VM: {vm_data_df.vmName.count()}')
     print("\nVM Power States:")
     print(vm_data_df['vmState'].value_counts())
@@ -241,4 +243,4 @@ def data_describe(output_path,csv_file):
     print(f'\nTotal used VMDK (GiB): {vm_data_df.vmdkUsed.sum()}')
     print(f'\nTotal provisioned VMDK (GiB): {vm_data_df.vmdkTotal.sum()}')
     print(f'\n{vm_data_df.describe()}')
-    return vm_data_df.vmName.count()
+    return total_vms
