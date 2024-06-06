@@ -1,9 +1,6 @@
-#!/usr/bin/env python
-
-import argparse
-from argparse import SUPPRESS
 import pandas as pd
 import sys
+from validation import filetype_validation
 
 def describe_import(**kwargs):
     print("Getting overview of environment.")
