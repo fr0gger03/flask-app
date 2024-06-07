@@ -12,8 +12,8 @@ env:
   DOCKER_ORG: thomastwyman557
   IMAGE_NAME: thomastwyman557/flask-pandas-app
   SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
-  context: src
-  DOCKERFILE_PATH: src/Dockerfile
+  context: ./src
+  file: ./src/Dockerfile
   COMPARE_TAG: latest
 
 jobs:
@@ -47,7 +47,7 @@ jobs:
       - name: Build and push Docker image on push
         id: build-and-push
         if: ${{ github.event_name != 'pull_request_target' }}
-        uses: docker/build-push-action@v4
+        uses: docker/build-push-action@v5
         with:
           context: .
           load: false
