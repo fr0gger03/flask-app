@@ -60,7 +60,7 @@ def success(input_path, file_type, file_name):
 
     if vm_data_df is not None:
         # access the result in the tempalte, for example {{ vms }}
-        return render_template('success.html', fn=file_name, ft=file_type)
+        return render_template('success.html', fn=file_name, ft=file_type, tables=[vm_data_df.to_html()], titles=[''])
     else:
         print()
         print("Something went wrong.  Please check your syntax and try again.")

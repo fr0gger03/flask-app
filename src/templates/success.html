@@ -6,5 +6,19 @@
       <p>File uploaded successfully</p> 
       <p>File Name: {{fn}}</p> 
       <p>File type: {{ft}}</p> 
+      <br>
+      <br>
+      <div align="center"> 
+         <table> 
+             <h1> 
+             <!--Displaying the converted table-->
+                  {% for table in tables %} 
+                 <h2>{{titles[loop.index]}}</h2>                             
+                 {{ table|safe }} 
+                 {% endfor %}      
+             </h1>  
+         </table> 
+     </div> 
+
    </body> 
 </html>
