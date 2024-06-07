@@ -12,8 +12,6 @@ env:
   DOCKER_ORG: thomastwyman557
   IMAGE_NAME: thomastwyman557/flask-pandas-app
   SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
-  context: ./src
-  file: ./src/Dockerfile
   COMPARE_TAG: latest
 
 jobs:
@@ -49,7 +47,8 @@ jobs:
         if: ${{ github.event_name != 'pull_request_target' }}
         uses: docker/build-push-action@v5
         with:
-          # context: .
+          context: ./src
+          file: ./src/Dockerfile
           load: false
           push: true
           tags: ${{ steps.meta.outputs.tags }}
@@ -63,7 +62,8 @@ jobs:
         if: ${{ github.event_name == 'pull_request_target' }}
         uses: docker/build-push-action@v4
         with:
-          # context: .
+          context: ./src
+          file: ./src/Dockerfile
           load: true
           push: false
           tags: ${{ steps.meta.outputs.tags }}
