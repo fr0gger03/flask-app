@@ -19,5 +19,5 @@ def filetype_validation(input_path, fn):
         file_type="rv-tools"
     else:
         print(f'{fn} is neither a LiveOptics file, nor an RV Tools file, else is not correctly formed / complete.')
-        sys.exit(1)
+        file_type="invalid"
     return file_type
