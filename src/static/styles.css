@@ -1,0 +1,13 @@
+/*
+ * Custom CSS
+ */
+
+  :root {
+    --bs-body-bg: var(--bs-gray-100);
+  }
+  th {
+    text-align: center;
+  }
+  tr {
+    text-align: center;
+  }
