@@ -1,16 +1,6 @@
 name: docker-build
 
 on:
-  # push:
-  #   branches:
-  #     - main
-  #   tags:
-  #     - v*
-  # pull_request_target:
-  #   branches:
-  #     - main
-  #   tags:
-  #     - v*
   push:
     branches:
       - "**"
@@ -103,7 +93,8 @@ jobs:
         with:
           command: cves,recommendations
           only-fixed: true
-          image: ${{ steps.meta.outputs.tags }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
+          # image: ${{ steps.meta.outputs.tags }}
           platform: "linux/amd64"
           summary: true
       
@@ -114,7 +105,8 @@ jobs:
         with:
           command: compare
           only-fixed: true
-          image: ${{ steps.meta.outputs.tags }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
+          # image: ${{ steps.meta.outputs.tags }}
           to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           only-severities: critical,high
           platform: "linux/amd64"
