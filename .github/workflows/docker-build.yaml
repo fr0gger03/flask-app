@@ -88,24 +88,24 @@ jobs:
 
       - name: Analyze for critical and high CVEs
         id: docker-scout-cves
-        if: ${{ github.event_name != 'pull_request_target' }}
+        # if: ${{ github.event_name != 'pull_request_target' }}
         uses: docker/scout-action@v1.9.3
         with:
           command: cves,recommendations
           only-fixed: true
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           # image: ${{ steps.meta.outputs.tags }}
           platform: "linux/amd64"
           summary: true
       
       - name: Compare to deployed image
         id: docker-scout-compare
-        if: ${{ github.event_name == 'pull_request_target' }}
+        # if: ${{ github.event_name == 'pull_request_target' }}
         uses: docker/scout-action@main
         with:
           command: compare
           only-fixed: true
-          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
+          image: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
           # image: ${{ steps.meta.outputs.tags }}
           to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           only-severities: critical,high
