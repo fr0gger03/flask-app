@@ -84,7 +84,7 @@ jobs:
       - name: Analyze for critical and high CVEs
         id: docker-scout-cves
         if: ${{ github.event_name != 'pull_request_target' }}
-        uses: docker/scout-action@v1.9.3
+        uses: docker/scout-action@v1
         with:
           command: cves,recommendations
           only-fixed: true
@@ -100,6 +100,7 @@ jobs:
           command: compare
           only-fixed: true
           image: ${{ steps.meta.outputs.tags }}
+          to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           only-severities: critical,high
           to-env: prod
           platform: "linux/arm64"
