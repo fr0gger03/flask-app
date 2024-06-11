@@ -1,16 +1,23 @@
 name: docker-build
 
 on:
+  # push:
+  #   branches:
+  #     - main
+  #   tags:
+  #     - v*
+  # pull_request_target:
+  #   branches:
+  #     - main
+  #   tags:
+  #     - v*
   push:
     branches:
-      - main
+      - "**"
     tags:
-      - v*
-  pull_request_target:
-    branches:
-      - main
-    tags:
-      - v*
+      - "v*.*.*"
+  pull_request:
+
 
 env:
   REGISTRY: docker.io
@@ -44,9 +51,9 @@ jobs:
         uses: docker/metadata-action@v5.5.1
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          labels: |
-            org.opencontainers.image.revision=${{ env.SHA }}
-            com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
+          # labels: |
+          #   org.opencontainers.image.revision=${{ env.SHA }}
+          #   com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
           tags: |
             type=schedule
             type=semver,pattern={{version}}
@@ -97,7 +104,7 @@ jobs:
           command: cves,recommendations
           only-fixed: true
           image: ${{ steps.meta.outputs.tags }}
-          platforms: "linux/amd64,linux/arm64"
+          platform: "linux/amd64"
           summary: true
       
       - name: Compare to deployed image
@@ -110,7 +117,6 @@ jobs:
           image: ${{ steps.meta.outputs.tags }}
           to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           only-severities: critical,high
-          to-env: prod
-          platforms: "linux/amd64,linux/arm64"
+          platform: "linux/amd64"
           exit-code: true       
           summary: true
