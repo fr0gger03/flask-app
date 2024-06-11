@@ -6,11 +6,11 @@ on:
       - main
     tags:
       - v*
-  pull_request_target:
-    branches:
-      - main
-    tags:
-      - v*
+  # pull_request_target:
+  #   branches:
+  #     - main
+  #   tags:
+  #     - v*
 
 env:
   REGISTRY: docker.io
@@ -48,15 +48,19 @@ jobs:
             org.opencontainers.image.revision=${{ env.SHA }}
             com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
           tags: |
-            type=ref,event=branch
+            type=schedule
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
           flavor: |
-            latest=true
+            latest=auto
 
       - name: Build and push Docker image on push
         id: build-and-push
-        if: ${{ github.event_name != 'pull_request_target' }}
+        # if: ${{ github.event_name != 'pull_request_target' }}
         uses: docker/build-push-action@v5.4.0
         with:
           context: ./src
@@ -72,7 +76,7 @@ jobs:
     
       - name: Build and push Docker image on PR
         id: build-and-push-pr
-        if: ${{ github.event_name == 'pull_request_target' }}
+        # if: ${{ github.event_name == 'pull_request_target' }}
         uses: docker/build-push-action@v5.4.0
         with:
           context: ./src
@@ -87,7 +91,7 @@ jobs:
 
       - name: Analyze for critical and high CVEs
         id: docker-scout-cves
-        if: ${{ github.event_name != 'pull_request_target' }}
+        # if: ${{ github.event_name != 'pull_request_target' }}
         uses: docker/scout-action@v1.9.3
         with:
           command: cves,recommendations
@@ -98,7 +102,7 @@ jobs:
       
       - name: Compare to deployed image
         id: docker-scout-compare
-        if: ${{ github.event_name == 'pull_request_target' }}
+        # if: ${{ github.event_name == 'pull_request_target' }}
         uses: docker/scout-action@main
         with:
           command: compare
