@@ -12,7 +12,7 @@ env:
   DOCKER_ORG: thomastwyman557
   IMAGE_NAME: thomastwyman557/flask-pandas-app
   SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
-  # IMAGE_TAG: latest
+  IMAGE_TAG: latest
   COMPARE_TAG: latest
 
 jobs:
@@ -43,13 +43,18 @@ jobs:
             org.opencontainers.image.revision=${{ env.SHA }}
             com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
           tags: |
-            type=schedule
-            type=ref,event=branch
-            type=ref,event=pr
             type=semver,pattern={{version}}
             type=semver,pattern={{major}}.{{minor}}
             type=semver,pattern={{major}}
-            type=sha            
+
+          # tags: |
+          #   type=schedule
+          #   type=ref,event=branch
+          #   type=ref,event=pr
+          #   type=semver,pattern={{version}}
+          #   type=semver,pattern={{major}}.{{minor}}
+          #   type=semver,pattern={{major}}
+          #   type=sha            
 
       - name: Build and push Docker image on push
         id: build-and-push
@@ -84,7 +89,7 @@ jobs:
       - name: Analyze for critical and high CVEs
         id: docker-scout-cves
         if: ${{ github.event_name != 'pull_request_target' }}
-        uses: docker/scout-action@v1
+        uses: docker/scout-action@v1.9.3
         with:
           command: cves,recommendations
           only-fixed: true
