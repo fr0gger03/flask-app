@@ -54,14 +54,14 @@ jobs:
           # labels: |
           #   org.opencontainers.image.revision=${{ env.SHA }}
           #   com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
-          tags: |
-            type=schedule
-            type=semver,pattern={{version}}
-            type=semver,pattern={{major}}.{{minor}}
-            type=semver,pattern={{major}}
-            type=ref,event=branch
-            type=ref,event=pr
-            type=sha
+          # tags: |
+          #   type=schedule
+          #   type=semver,pattern={{version}}
+          #   type=semver,pattern={{major}}.{{minor}}
+          #   type=semver,pattern={{major}}
+          #   type=ref,event=branch
+          #   type=ref,event=pr
+          #   type=sha
           flavor: |
             latest=auto
 
