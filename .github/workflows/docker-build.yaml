@@ -69,6 +69,7 @@ jobs:
           sbom: true
           provenance: true
       
+    
       - name: Build and push Docker image on PR
         id: build-and-push-pr
         if: ${{ github.event_name == 'pull_request_target' }}
