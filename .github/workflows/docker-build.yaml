@@ -51,17 +51,17 @@ jobs:
         uses: docker/metadata-action@v5.5.1
         with:
           images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-          # labels: |
-          #   org.opencontainers.image.revision=${{ env.SHA }}
-          #   com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
-          # tags: |
-          #   type=schedule
-          #   type=semver,pattern={{version}}
-          #   type=semver,pattern={{major}}.{{minor}}
-          #   type=semver,pattern={{major}}
-          #   type=ref,event=branch
-          #   type=ref,event=pr
-          #   type=sha
+          labels: |
+            org.opencontainers.image.revision=${{ env.SHA }}
+            com.docker.image.source.entrypoint=${{ env.DOCKERFILE_PATH }}
+          tags: |
+            type=schedule
+            type=semver,pattern={{version}}
+            type=semver,pattern={{major}}.{{minor}}
+            type=semver,pattern={{major}}
+            type=ref,event=branch
+            type=ref,event=pr
+            type=sha
           flavor: |
             latest=auto
 
