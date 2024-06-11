@@ -17,7 +17,7 @@ env:
   DOCKER_ORG: thomastwyman557
   IMAGE_NAME: thomastwyman557/flask-pandas-app
   SHA: ${{ github.event.pull_request.head.sha || github.event.after }}
-  # IMAGE_TAG: latest
+  IMAGE_TAG: latest
   COMPARE_TAG: latest
 
 jobs:
@@ -85,7 +85,7 @@ jobs:
           push: false
           tags: ${{ steps.meta.outputs.tags }}
           labels: ${{ steps.meta.outputs.labels }}
-          platforms: "linux/arm64"
+          platforms: "linux/amd64,linux/arm64"
           sbom: true
           provenance: true      
 
@@ -97,7 +97,7 @@ jobs:
           command: cves,recommendations
           only-fixed: true
           image: ${{ steps.meta.outputs.tags }}
-          platform: "linux/arm64"
+          platforms: "linux/amd64,linux/arm64"
           summary: true
       
       - name: Compare to deployed image
@@ -111,6 +111,6 @@ jobs:
           to: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}:${{ env.COMPARE_TAG }}
           only-severities: critical,high
           to-env: prod
-          platform: "linux/arm64"
+          platforms: "linux/amd64,linux/arm64"
           exit-code: true       
           summary: true
