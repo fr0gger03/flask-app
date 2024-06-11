@@ -2,7 +2,7 @@ name: docker-build
 
 on:
   push:
-    # branches: ["main"]
+    branches: ["main"]
     tags: ["v*.*.*"]
   pull_request_target:
     # branches: ["main"]
