@@ -19,7 +19,7 @@ env:
   ECR_REPOSITORY: ttwyman-flask-app
   ECS_SERVICE: flaskappservice
   ECS_CLUSTER: flaskappcluster
-  ECS_TASK_DEFINITION: .aws/flaskappspecfamily-revision1-corp.json
+  ECS_TASK_DEFINITION: .aws/flaskappspecfamily-revision3-corp.json
   CONTAINER_NAME: flaskappcontainer
 
 jobs:
