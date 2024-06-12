@@ -12,14 +12,14 @@ name: Deploy to Amazon ECS
 on:
   push:
     tags:
-      - "v*.*.*"
+      - "corp-v*.*.*"
 
 env:
   AWS_REGION: us-east-1
-  ECR_REPOSITORY: flask-pandas-app
+  ECR_REPOSITORY: ttwyman-flask-app
   ECS_SERVICE: flaskappservice
   ECS_CLUSTER: flaskappcluster
-  ECS_TASK_DEFINITION: .aws/flask-app-family-revision1.json
+  ECS_TASK_DEFINITION: .aws/flaskappspecfamily-revision1-corp.json
   CONTAINER_NAME: flaskappcontainer
 
 jobs:
@@ -35,8 +35,8 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@0e613a0980cbf65ed5b322eb7a1e075d28913a83
         with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID_CORP }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY_CORP }}
           aws-region: ${{ env.AWS_REGION }}
 
       - name: Login to Amazon ECR
