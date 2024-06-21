@@ -46,6 +46,7 @@ def upload_file():
             return redirect(url_for('success', input_path=input_path, file_type=ft, file_name=filename))
 
 
+
 @app.route('/success/<input_path>/<file_type>/<file_name>')
 def success(input_path, file_type, file_name):
     describe_params={"file_name":file_name, "input_path":input_path}
