@@ -19,7 +19,6 @@ ALLOWED_EXTENSIONS = {'xls','xlsx'}
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-# app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://inventorydbuser:password@db:5432/inventorydb'
 
 app.config['SECRET_KEY'] = 'thisisasecretkey'
