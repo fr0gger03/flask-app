@@ -14,11 +14,12 @@
     <form method="POST" action="">
         {{ form.hidden_tag() }}
         {{ form.username }}
-        {% endfor %}
         {{ form.password }}
+        {{ form.submit }}
+        <br>
         {% for error in form.username.errors %}
         <span style="color: red;">[{{ error }}]</span>
-        {{ form.submit }}
+        {% endfor %}
     </form>
 
     <a href="{{ url_for('login') }}">Already have an account? Log In</a>

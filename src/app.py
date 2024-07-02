@@ -13,19 +13,21 @@ from data_validation import filetype_validation
 from transform_lova import lova_conversion
 from transform_rvtools import rvtools_conversion
 
-# filename=''
+
 UPLOAD_FOLDER = 'input/'
 ALLOWED_EXTENSIONS = {'xls','xlsx'}
+
+def allowed_file(file_name):
+    return '.' in file_name and \
+           file_name.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
 app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://inventorydbuser:password@db:5432/inventorydb'
-
 app.config['SECRET_KEY'] = 'thisisasecretkey'
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
-
 login_manager = LoginManager()
 login_manager.init_app(app)
 login_manager.login_view = 'login'
@@ -68,6 +70,7 @@ class LoginForm(FlaskForm):
                              InputRequired(), Length(min=8, max=20)], render_kw={"placeholder": "Password"})
 
     submit = SubmitField('Login')
+
 
 @app.route('/')
 def index():
@@ -114,9 +117,7 @@ def register():
 
 
 @app.route('/upload', methods=['GET', 'POST'])
-def allowed_file(filename):
-    return '.' in filename and \
-           filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+@login_required
 def upload_file():
     if request.method == 'POST':
         # check if the post request has the file part
@@ -140,6 +141,7 @@ def upload_file():
 
 
 @app.route('/success/<input_path>/<file_type>/<file_name>')
+@login_required
 def success(input_path, file_type, file_name):
     describe_params={"file_name":file_name, "input_path":input_path}
 
