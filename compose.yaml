@@ -4,7 +4,8 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile-flask
-    image: ttwyman-flask-app-frontend
+      tags:
+        - "thomastwyman557/ttwyman-flask-app-frontend"
     ports:
       - 80:5000
     depends_on:
@@ -15,7 +16,8 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile-postgres
-    image: ttwyman-flask-app-db
+      tags:
+        - "thomastwyman557/ttwyman-flask-app-db"
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -31,6 +33,12 @@ services:
 
   adminer:
     image: adminer
+    build:
+      context: .
+      dockerfile_inline: |
+        FROM adminer:latest
+      tags:
+        - "thomastwyman557/ttwyman-flask-app-admin"
     restart: always
     ports:
       - 8080:8080
