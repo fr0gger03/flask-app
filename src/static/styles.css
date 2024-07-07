@@ -3,11 +3,24 @@
  */
 
   :root {
-    --bs-body-bg: var(--bs-gray-100);
+    --bs-body-bg: #007cba;
+    --bs-link-color: #ffffffaa;
   }
-  th {
+  body {
+    font: 1rem/1.5 var(--bs-font-sans-serif);
+    color: white;
+    margin: 50px;
+    padding: 10px;
+    background-color: var(--bs-body-bg);
+  }
+  a {
+    color: var(--bs-link-color);
+  }
+  th, td {
     text-align: center;
   }
   tr {
     text-align: center;
   }
+
+
