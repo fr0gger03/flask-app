@@ -3,9 +3,9 @@ from pandas import testing as pdtest
 from ..src.transform_rvtools import rvtools_conversion
 
 def test_lova_transform():
-    target_df = pd.read_csv('target_csv_file')
+    target_df = pd.read_csv('rvtools_expected_df.csv')
 
-    file_name = 'source_rvtools_file'
+    file_name = 'rvtools_file_sample.xlsx'
     input_path = 'test/'
     describe_params = {"file_name":file_name, "input_path":input_path}
     source_df = pd.DataFrame(rvtools_conversion(**describe_params))
