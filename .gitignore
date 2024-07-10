@@ -1,4 +1,4 @@
 .dockerignore
-test/
+# test/
 **/.DS_Store
-.DS_Store
+.DS_Storevenv-flask
