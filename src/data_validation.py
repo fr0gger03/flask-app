@@ -1,5 +1,4 @@
 import pandas as pd
-import sys
 
 def filetype_validation(input_path, fn):
     print("determining file type")

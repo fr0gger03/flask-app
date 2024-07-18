@@ -1,5 +1,6 @@
 
 import os
+import sys
 import pandas as pd
 from flask import Flask, flash, request, redirect, render_template, send_file, url_for
 from werkzeug.utils import secure_filename
@@ -9,9 +10,16 @@ from flask_wtf import FlaskForm
 from wtforms import StringField, PasswordField, SubmitField
 from wtforms.validators import InputRequired, Length, ValidationError
 from flask_bcrypt import Bcrypt
-from data_validation import filetype_validation
-from transform_lova import lova_conversion
-from transform_rvtools import rvtools_conversion
+
+if 'pytest' in sys.modules:
+    from src.data_validation import filetype_validation
+    from src.transform_lova import lova_conversion
+    from src.transform_rvtools import rvtools_conversion
+else:
+    from data_validation import filetype_validation
+    from transform_lova import lova_conversion
+    from transform_rvtools import rvtools_conversion
+
 
 
 UPLOAD_FOLDER = 'input/'
