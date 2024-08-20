@@ -11,6 +11,15 @@ services:
     depends_on:
       db:
         condition: service_healthy
+    # volumes:
+    #  - "./src/templates:/app/templates"
+    develop:
+      watch:
+        - action: rebuild
+          path: ./src
+          target: /app
+        - action: rebuild
+          path: ./src/requirements.txt
 
   db:
     build:
@@ -41,7 +50,7 @@ services:
         - "thomastwyman557/ttwyman-flask-app-admin"
     restart: always
     ports:
-      - 8080:8080
+      - 8081:8080
 
 volumes:
   db-data:
