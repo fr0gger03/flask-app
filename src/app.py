@@ -29,8 +29,14 @@ def allowed_file(file_name):
 
 app = Flask(__name__)
 app.config['UPLOAD_FOLDER'] = UPLOAD_FOLDER
-app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://inventorydbuser:password@db:5432/inventorydb'
 app.config['SECRET_KEY'] = 'thisisasecretkey'
+
+if 'pytest' in sys.modules:
+    # Use the dynamic connection URL provided by the test container during tests
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv('DATABASE_TEST_URI', 'postgresql://inventorydbuser:password@localhost:5432/inventorydb')
+else:
+    # Use the hostname "db" - defined in compose.yaml - as database hostname
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'postgresql://inventorydbuser:password@db:5432/inventorydb'
 
 db = SQLAlchemy(app)
 bcrypt = Bcrypt(app)
@@ -126,7 +132,8 @@ def login():
             if bcrypt.check_password_hash(user.password, form.password.data):
                 login_user(user)
                 return redirect(url_for('dashboard'))
-    return render_template('login.html', form=form)
+    else:
+        return render_template('login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])
