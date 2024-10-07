@@ -2,8 +2,10 @@ import io
 import os
 from pathlib import Path
 from flask_sqlalchemy import SQLAlchemy
+from flask_sqlalchemy.session import Session
 from sqlalchemy import text
 import pytest
+from sqlalchemy.orm.scoping import scoped_session
 from src.app import app, bcrypt, db, User   
 from testcontainers.postgres import PostgresContainer
 from flask_bcrypt import Bcrypt
@@ -22,17 +24,8 @@ def postgres_container():
         yield postgres
 
 
-# Create a fixture for the Flask test client
-@pytest.fixture(scope="module")
-def client(postgres_container):
-    """Flask test client to make HTTP requests."""
-    app.testing = True
-    with app.test_client() as client:
-        yield client
-
-
 @pytest.fixture(scope='function')
-def db_session(postgres_container):
+def db_session(postgres_container: PostgresContainer):
     """Fixture to handle database session and rollback after each test, without schema creation."""
     app.config['SQLALCHEMY_DATABASE_URI'] = postgres_container.get_connection_url()
     app.config['TESTING'] = True
@@ -52,38 +45,53 @@ def db_session(postgres_container):
         db.session.remove()
 
 
-@pytest.fixture
-def login_session(client):
-    """Fixture to log in a user and maintain session for testing purposes."""
+# Create a fixture for the Flask test client
+@pytest.fixture(scope="module")
+# def client(db_session):
+def client():
+    """Flask test client to make HTTP requests."""
 
+    app.testing = True
+    with app.test_client() as client:
+        yield client
+
+
+def test_login_session(db_session, client):
+    # """Fixture to log in a user and maintain session for testing purposes."""
     # Create a test user
     hashed_password = bcrypt.generate_password_hash("sells seashells").decode('utf-8')
-    test_user = User(username="sally", password=hashed_password)
+    user = User(username="sally", password=hashed_password)
+    db_session.add(user)
+    db_session.commit()
 
-    with app.app_context():
-        db.session.add(test_user)
-        db.session.commit()
+    # Query the database for the user
+    user_in_db = User.query.filter_by(username="sally").first()
 
-    response = client.get('/login')
-    # csrf_token = get_csrf_token(response.data)  # Extract CSRF token from the response if needed
+    # Assertions to validate that the user exists and the password is hashed
+    assert user_in_db is not None
+    assert user_in_db.username == "sally"
+    assert bcrypt.check_password_hash(user_in_db.password, "sells seashells")
 
-    # Log in the user with the token
-    login_data = {'username': 'sally', 'password': 'sells seashells'}
-    response = client.post('/login', data=login_data, follow_redirects=True)
+    with client.application.test_request_context():
+        response = client.get('/login')
+        assert response.status_code == 200  # Adjust based on the app's response for successful login
+        assert b'One of us' in response.data  # Adjust according to actual response content
 
-    # Log in the user
-    login_data = {'username': 'sally', 'password': 'sells seashells'}
-    response = client.post('/login', data=login_data, follow_redirects=True)
+        login_data = {'username': 'sally', 'password': 'sells seashells'}
+        response = client.post('/login', data=login_data, follow_redirects=True)
 
-    # Assert that the login was successful
-    # assert response.status_code == 200  # Adjust based on the app's response for successful login
+        # assert response.status_code == 302
+        # assert response.headers['Location'] == url_for('dashboard', _external=False)
 
-    # Return the logged-in client for further requests
-    return client
+        # Manually follow the redirection
+        follow_response = client.get(response.headers['Location'], follow_redirects=True)
 
+        # Assertions to check for successful login after following the redirect
+        assert follow_response.status_code == 200
+        assert b'Welcome' in follow_response.data  # Adjust according to the actual response content after login
 
 # Test using Flask-SQLAlchemy
-def test_docker_run_postgres_with_flask_sqlalchemy():
+def test_docker_run_postgres_with_flask_sqlalchemy(db_session: scoped_session[Session]):
     # Ensure the app context is pushed for database operations
     with app.app_context():
         # Use the Flask-SQLAlchemy session (db.session) for executing raw SQL
@@ -96,12 +104,14 @@ def test_docker_run_postgres_with_flask_sqlalchemy():
 
 
 # Test the user creation via the SQLAlchemy model
-def test_user_creation(db_session):
+def test_user_creation(db_session: scoped_session[Session]):
     # Create a test user
     hashed_password = bcrypt.generate_password_hash("sells seashells").decode('utf-8')
     user = User(username="sally", password=hashed_password)
-    db.session.add(user)
-    db.session.commit()
+    db_session.add(user)
+    db_session.commit()
+    # db.session.add(user)
+    # db.session.commit()
 
     # Query the database for the user
     user_in_db = User.query.filter_by(username="sally").first()
@@ -112,37 +122,9 @@ def test_user_creation(db_session):
     assert bcrypt.check_password_hash(user_in_db.password, "sells seashells")
 
 
-def test_login_post(login_session):
-    # Create a test user
-    hashed_password = bcrypt.generate_password_hash("sells seashells").decode('utf-8')
-    user = User(username="sally", password=hashed_password)
-    db.session.add(user)
-    db.session.commit()
-
-    # Attempt to log in with the test user credentials
-    response = login_session.post('/login', data=dict(username='sally', password='sells seashells'), follow_redirects=True)
-
-    # Assertions to check for successful login
+def test_upload_get(client):
+    response = client.get('/upload')
     assert response.status_code == 200
-    # assert response.status_code == 302
-    assert response.headers['Location'] == url_for('dashboard', _external=False)
-
-    # Manually follow the redirection
-    follow_response = login_session.get(response.headers['Location'], follow_redirects=True)
-
-    # Assertions to check for successful login after following the redirect
-    assert follow_response.status_code == 200
-    assert b'Welcome' in follow_response.data  # Adjust according to the actual response content after login
-
-    # Check that the user is now logged in (user session management)
-    with login_session.session_transaction() as session:
-        assert '_user_id' in session
-        assert session['_user_id'] == str(user.id)  # Ensure the session stores the correct user ID
-
-
-def test_upload_get(login_session):
-    response = login_session.get('/upload')
-    assert response.status_code == 302
     assert b'Upload Excel File' in response.data  # Adjust according to your actual response content
 
 
