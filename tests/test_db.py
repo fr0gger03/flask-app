@@ -110,8 +110,6 @@ def test_user_creation(db_session: scoped_session[Session]):
     user = User(username="sally", password=hashed_password)
     db_session.add(user)
     db_session.commit()
-    # db.session.add(user)
-    # db.session.commit()
 
     # Query the database for the user
     user_in_db = User.query.filter_by(username="sally").first()
