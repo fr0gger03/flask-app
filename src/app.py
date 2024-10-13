@@ -19,8 +19,11 @@ else:
     from transform_lova import lova_conversion
     from transform_rvtools import rvtools_conversion
 
+if 'pytest' in sys.modules:
+    UPLOAD_FOLDER = './src/input/'
+else:
+    UPLOAD_FOLDER = 'input/'
 
-UPLOAD_FOLDER = 'input/'
 ALLOWED_EXTENSIONS = {'xls','xlsx'}
 
 def allowed_file(file_name):
@@ -130,10 +133,13 @@ def login():
         user = User.query.filter_by(username=form.username.data).first()
         if user:
             if bcrypt.check_password_hash(user.password, form.password.data):
-                login_user(user)
-                return redirect(url_for('dashboard'))
+                if login_user(user):
+                    return redirect(url_for('dashboard'))
     else:
-        return render_template('login.html', form=form)
+        for fieldName, errorMessages in form.errors.items():
+            for err in errorMessages:
+                print(fieldName, err)
+    return render_template('login.html', form=form)
 
 
 @app.route('/dashboard', methods=['GET', 'POST'])

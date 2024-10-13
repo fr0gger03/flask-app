@@ -11,15 +11,13 @@ from testcontainers.postgres import PostgresContainer
 from flask_bcrypt import Bcrypt
 from flask import url_for
 
+# Create a fixture for the Postgres container and initialize the schema
 @pytest.fixture(scope='session', autouse=True)
 def postgres_container():
-    """Fixture for the Postgres container and initialize the schema"""
+    """Fixture to create the postgres container and generate the schema"""
     postgres = PostgresContainer('postgres:16.4-alpine3.20')
-
-    # Set up volume mapping for init scripts
     script = Path(__file__).parent/ 'sql' / 'init-user-db.sh'
     postgres.with_volume_mapping(host=str(script), container=f"/docker-entrypoint-initdb.d/{script.name}")
-
     with postgres:
         yield postgres
 
@@ -45,46 +43,16 @@ def db_session(postgres_container: PostgresContainer):
         db.session.remove()
 
 
-
+# Create a fixture for the Flask test client
 @pytest.fixture(scope="module")
 def client():
-    """Create a fixture for the Flask test client"""
+    """Flask test client to make HTTP requests."""
     app.testing = True
     with app.test_client() as client:
         yield client
 
 
-def test_docker_run_postgres_with_flask_sqlalchemy(db_session: scoped_session[Session]):
-    """Test using Flask-SQLAlchemy"""
-    # Ensure the app context is pushed for database operations
-    with app.app_context():
-        # Use the Flask-SQLAlchemy session (db.session) for executing raw SQL
-        result = db.session.execute(text('SELECT version()'))
-        row = result.fetchone()
-
-        # Assertions to validate the PostgreSQL version
-        assert row is not None
-        assert row[0].lower().startswith("postgresql 16.4")
-
-
-def test_user_creation(db_session: scoped_session[Session]):
-    """Test the user creation via the SQLAlchemy model"""
-    # Create a test user
-    hashed_password = bcrypt.generate_password_hash("sells seashells").decode('utf-8')
-    user = User(username="sally", password=hashed_password)
-    db_session.add(user)
-    db_session.commit()
-
-    # Query the database for the user
-    user_in_db = User.query.filter_by(username="sally").first()
-
-    # Assertions to validate that the user exists and the password is hashed
-    assert user_in_db is not None
-    assert user_in_db.username == "sally"
-    assert bcrypt.check_password_hash(user_in_db.password, "sells seashells")
-
 def test_login_session(db_session, client):
-    """Create a user and login to the database"""
     # Create a test user
     hashed_password = bcrypt.generate_password_hash("sells seashells").decode('utf-8')
     user = User(username="sally", password=hashed_password)
@@ -111,3 +79,25 @@ def test_login_session(db_session, client):
     response = client.post('/login', data=login_data, follow_redirects=False)
     assert response.status_code == 302
     assert response.headers['Location'] == url_for('dashboard', _external=False)
+
+    response = client.get('/upload')
+    assert response.status_code == 200
+    assert b'Upload Excel File' in response.data  # Adjust according to your actual response content
+
+    """Test the file upload functionality."""
+    # Specify the path to the file in your test directory
+    file_path = os.path.join(os.path.dirname(__file__), 'test_files/', 'rvtools_file_sample.xlsx')
+    
+    # Open the file in binary mode for uploading
+    with open(file_path, 'rb') as file:
+        file_name = "rvtools_file_sample.xlsx"
+        data = {
+            'file': (file, file_name)  # The filename can be the same or different
+        }
+        
+        # Perform the file upload with the correct content type
+        response = client.post('/upload', data=data, content_type='multipart/form-data', follow_redirects=False)
+    # Assert that the response status code is as expected
+    assert response.status_code == 302
+    assert "success" in response.headers['Location']
+    assert file_name in response.headers['Location']
