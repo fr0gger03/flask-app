@@ -3,4 +3,5 @@
 **/.DS_Store
 .DS_Storevenv-flask
 venv-flask
+/input/rvtools_file_sample.xlsx
 **/__pycache__
