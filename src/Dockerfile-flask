@@ -1,7 +1,7 @@
 # syntax=docker/dockerfile:1
 
 ARG PYTHON_VERSION=3.12.6
-FROM python:${PYTHON_VERSION}-alpine
+FROM python:${PYTHON_VERSION}-alpine AS base
 
 # Prevents Python from writing pyc files.
 ENV PYTHONDONTWRITEBYTECODE=1
@@ -26,4 +26,9 @@ COPY . .
 RUN chown -R appuser:appuser .  && chmod -R 1777 .
 USER appuser
 EXPOSE 5000
+
+FROM base AS test
+CMD [ "python", "-m" , "flask", "run", "--debug", "--host=0.0.0.0"]
+
+FROM base AS prod
 CMD [ "python", "-m" , "flask", "run", "--host=0.0.0.0"]

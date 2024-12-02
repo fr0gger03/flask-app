@@ -4,6 +4,7 @@
 
   :root {
     --bs-body-bg: #007cba;
+    /* --bs-body-bg: #00ba0f; */
     --bs-link-color: #ffffffaa;
   }
   body {

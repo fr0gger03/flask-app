@@ -4,20 +4,22 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile-flask
+      target: test
       tags:
-        - "thomastwyman557/ttwyman-flask-app-frontend"
+        - "thomastwyman557/python-web-demo-frontend"
     ports:
       - 80:5000
     depends_on:
       db:
         condition: service_healthy
-    # volumes:
-    #  - "./src/templates:/app/templates"
     develop:
       watch:
-        - action: rebuild
-          path: ./src
-          target: /app
+        - action: sync
+          path: ./src/static
+          target: /app/static
+        - action: sync
+          path: ./src/templates
+          target: /app/templates
         - action: rebuild
           path: ./src/requirements.txt
 
@@ -25,8 +27,9 @@ services:
     build:
       context: ./src
       dockerfile: Dockerfile-postgres
+      target: test
       tags:
-        - "thomastwyman557/ttwyman-flask-app-db"
+        - "thomastwyman557/python-web-demo-db"
     restart: always
     volumes:
       - db-data:/var/lib/postgresql/data
@@ -47,7 +50,7 @@ services:
       dockerfile_inline: |
         FROM adminer:latest
       tags:
-        - "thomastwyman557/ttwyman-flask-app-admin"
+        - "thomastwyman557/adminer"
     restart: always
     ports:
       - 8081:8080
